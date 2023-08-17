@@ -15,7 +15,7 @@ public class AtomicMRMW<T> implements Register<T>{
 
     public void write(T value) {
         // code here
-        int me = ThreadID.get();
+        int me = filterThread(Thread.currentThread().getName());
         long maxStamp = Long.MIN_VALUE;
 
         for (int i = 0; i < capacity; i++) {
@@ -33,4 +33,9 @@ public class AtomicMRMW<T> implements Register<T>{
         }
         return max.value;
     }
+
+    public int filterThread(String thread) {
+		//Start At Thread 0
+		return Character.getNumericValue(thread.charAt(7));
+	}
 }

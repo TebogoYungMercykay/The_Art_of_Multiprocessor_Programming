@@ -12,10 +12,15 @@ public class MyThreads extends Thread {
         // code here
         if (writer) {
             // Perform write operation
-            register.write(ThreadID.get());
+            register.write(filterThread(Thread.currentThread().getName()));
         } else {
             // Perform read operation
             register.read();
         }
+	}
+
+    public int filterThread(String thread) {
+		//Start At Thread 0
+		return Character.getNumericValue(thread.charAt(7));
 	}
 }

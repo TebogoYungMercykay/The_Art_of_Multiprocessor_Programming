@@ -24,4 +24,9 @@ public class AtomicSRSW<T> implements Register<T> {
         this.r_value = new StampedValue<T>(stamp, v);
         this.lastStamp = stamp;
     }
+
+    public int filterThread(String thread) {
+		//Start At Thread 0
+		return Character.getNumericValue(thread.charAt(7));
+	}
 }

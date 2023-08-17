@@ -19,7 +19,7 @@ public class AtomicMRSW<T> implements Register<T> {
 
     public T read() {
         // code here
-        int me = ThreadID.get();
+        int me = filterThread(Thread.currentThread().getName());
         StampedValue<T> value = a_table[me][me];
 
         for (int i = 0; i < this.numReaders; i++) {
@@ -36,9 +36,15 @@ public class AtomicMRSW<T> implements Register<T> {
         long stamp = lastStamp + 1;
         lastStamp = stamp;
         StampedValue<T> value = new StampedValue<>(stamp, v);
+        int me = filterThread(Thread.currentThread().getName());
 
         for (int i = 0; i < this.numReaders; i++) {
             a_table[i][me] = value;
         }
     }
+
+    public int filterThread(String thread) {
+		//Start At Thread 0
+		return Character.getNumericValue(thread.charAt(7));
+	}
 }
