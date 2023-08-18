@@ -1,0 +1,1 @@
+Constructing a wait-free MRMW atomic register from SRSW Safe Boolean registers
