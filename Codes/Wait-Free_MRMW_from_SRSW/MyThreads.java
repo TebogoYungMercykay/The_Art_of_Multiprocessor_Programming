@@ -10,17 +10,16 @@ public class MyThreads extends Thread {
 	@Override
 	public void run() {
         // code here
-        if (writer) {
+        if (this.writer) {
+            // Generate a random value
+            Integer writtenValue = Integer.valueOf((int) ((Math.random() * 81) + 10));
             // Perform write operation
-            register.write(filterThread(Thread.currentThread().getName()));
+            this.register.write(writtenValue);
+            // Output:
+            System.out.println("(writer)[" + Thread.currentThread().getName() + "] : [" + writtenValue + "]" );
         } else {
             // Perform read operation
-            register.read();
+            System.out.println("(reader)[" + Thread.currentThread().getName() + "] : [" + this.register.read() + "]" );
         }
-	}
-
-    public int filterThread(String thread) {
-		//Start At Thread 0
-		return Character.getNumericValue(thread.charAt(7));
 	}
 }
