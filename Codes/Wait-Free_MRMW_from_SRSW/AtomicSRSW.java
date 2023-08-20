@@ -4,18 +4,25 @@ public class AtomicSRSW<T> implements Register<T> {
     long lastStamp;
     StampedValue<T> r_value; // regular SRSW timestamp-value pair
     StampedValue<T> lastRead;
+
     public AtomicSRSW(T init) {
         // code here
         this.lastStamp = 0;
         this.r_value = new StampedValue<T>(lastStamp, init);
-        this.lastRead = new StampedValue<T>(lastStamp, init);
+        this.lastRead = this.r_value;
+    }
+
+    public AtomicSRSW(long stamp, T init) {
+        // code here
+        this.lastStamp = stamp;
+        this.r_value = new StampedValue<T>(lastStamp, init);
+        this.lastRead = this.r_value;
     }
 
     public T read() {
         // code here
-        StampedValue<T> result = this.lastRead.max(r_value, lastRead);
-        this.lastRead = result;
-        return result.value;
+        this.lastRead = StampedValue.max(r_value, lastRead);
+        return this.lastRead.value;
     }
 
     public void write(T v) {
@@ -24,9 +31,4 @@ public class AtomicSRSW<T> implements Register<T> {
         this.r_value = new StampedValue<T>(stamp, v);
         this.lastStamp = stamp;
     }
-
-    public int filterThread(String thread) {
-		//Start At Thread 0
-		return Character.getNumericValue(thread.charAt(7));
-	}
 }
