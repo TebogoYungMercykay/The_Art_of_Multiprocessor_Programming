@@ -8,43 +8,39 @@ public class AtomicMRSW<T> implements Register<T> {
     public AtomicMRSW(T init, int readers) {
         // code here
         this.numReaders = readers;
-        a_table = new StampedValue[this.numReaders][this.numReaders];
+        this.a_table = new StampedValue[this.numReaders][this.numReaders];
 
         for (int i = 0; i < this.numReaders; i++) {
             for (int j = 0; j < this.numReaders; j++) {
-                a_table[i][j] = new StampedValue<AtomicSRSW<T>>(init); // Must Change!!
+                this.a_table[i][j] = new StampedValue<>(new AtomicSRSW<>(init));
             }
         }
     }
 
     public T read() {
         // code here
-        int me = filterThread(Thread.currentThread().getName());
-        StampedValue<T> value = a_table[me][me];
-
+        String threadName = Thread.currentThread().getName();
+        int me = Integer.parseInt(threadName.substring(threadName.length() - 1));
+        StampedValue<AtomicSRSW<T>> maxReadValue = this.a_table[me][me];
+        // Checking for maximum in the Column
         for (int i = 0; i < this.numReaders; i++) {
-            value = value.max(value, a_table[i][me]);
+            maxReadValue = StampedValue.max(maxReadValue, this.a_table[i][me]);
         }
-
+        // Writing the Maximum value to the Row
         for (int i = 0; i < this.numReaders; i++) {
-            a_table[me][i] = value;
+            this.a_table[me][i] = maxReadValue;
         }
+        return maxReadValue.value.read();
     }
 
     public void write(T v) {
         // code here
-        long stamp = lastStamp + 1;
-        lastStamp = stamp;
-        StampedValue<T> value = new StampedValue<>(stamp, v);
-        int me = filterThread(Thread.currentThread().getName());
-
+        long stamp = this.lastStamp + 1;
+        this.lastStamp = stamp;
+        StampedValue<AtomicSRSW<T>> value = new StampedValue<>(new AtomicSRSW<>(stamp, v));
+        // Writing the Value to the Diagonal.
         for (int i = 0; i < this.numReaders; i++) {
-            a_table[i][me] = value;
+            this.a_table[i][i] = value;
         }
     }
-
-    public int filterThread(String thread) {
-		//Start At Thread 0
-		return Character.getNumericValue(thread.charAt(7));
-	}
 }

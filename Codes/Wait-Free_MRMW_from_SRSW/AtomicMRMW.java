@@ -9,33 +9,26 @@ public class AtomicMRMW<T> implements Register<T>{
         this.a_table = new StampedValue[this.capacity];
 
         for (int i = 0; i < this.capacity; i++) {
-            this.a_table[i] = new StampedValue<>(new AtomicMRSW<>(init, capacity));
+            this.a_table[i] = new StampedValue<>(new AtomicMRSW<>(init, this.capacity));
         }
     }
 
     public void write(T value) {
-        // code here
-        int me = filterThread(Thread.currentThread().getName());
-        long maxStamp = Long.MIN_VALUE;
-
-        for (int i = 0; i < capacity; i++) {
-            maxStamp = Math.max(maxStamp, a_table[i].stamp);
+        String threadName = Thread.currentThread().getName();
+        int me = Integer.parseInt(threadName.substring(threadName.length() - 1));
+        StampedValue<AtomicMRSW<T>> maxStampedValue = this.a_table[0];
+        // Finding the Highest TimeStamp
+        for (int i = 0; i < this.capacity; i++) {
+            maxStampedValue = StampedValue.max(maxStampedValue, this.a_table[i]);
         }
-        a_table[me] = new StampedValue<>(maxStamp + 1, new AtomicMRSW<>(value, capacity));
+        // Writing the New Value into the Array
+        this.a_table[me] = new StampedValue<>(maxStampedValue.stamp + 1, new AtomicMRSW<>(value, this.capacity));
     }
 
     public T read() {
         // code here
-        StampedValue<T> max = StampedValue.MIN_VALUE;
-
-        for (int i = 0; i < capacity; i++) {
-            max = StampedValue.max(max, a_table[i]);
-        }
-        return max.value;
+        // Finding the Highest TimeStamp
+        StampedValue<AtomicMRSW<T>> maxStampedValue = StampedValue.max(this.a_table);
+        return maxStampedValue.value.read();
     }
-
-    public int filterThread(String thread) {
-		//Start At Thread 0
-		return Character.getNumericValue(thread.charAt(7));
-	}
 }
