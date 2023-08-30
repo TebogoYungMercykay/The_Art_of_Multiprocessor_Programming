@@ -1,0 +1,15 @@
+# CRUD API
+- You are part of a database development team using multi-threading to handle database request.
+- An  API  request  could  be  performing  any  of  the  following  operations  on  thedatabase:
+	- CREATE: Add a new record to the database.•READ: Returns a copy of the all records in the database.
+	- UPDATE:  Update  a  specific  record  in  the  database  given  partial  information,  idand name, about the record and the new information, practicals and assignments,to update.  Updates first match.
+	- DELETE: Delete a specific record from the database matching the given informa-tion, partial/full.  Delete first match.
+
+# The various requests to be made are stored in different queues based on the operationtype.  For each operation:
+	- There are n number of threads that handle the requests for that specific operation.
+	- Requests perform operations on the shared database.
+	- Only one thread may operate on the database at any given time.•The different operations are handled concurrently.
+	- A  request  fails  if  the  is  no  match,  for  UPDATE  and  DELETE,  and  the  attemptattribute gets incremented.
+	- If a request exceeds 2 attempts the request is deleted otherwise its added back tothe operations queue.
+	- Threads sleeps for random amount of time between 50 and 100ms after handling arequest.
+	- Threads will operate until all request are handled i.e.  the respective operation queueis empty.
