@@ -10,7 +10,7 @@ clean:
 	clear
 
 tar:
-	tar -cvz *.java -f Code.tar.gz
+	tar -cvz *.java -f Code.gz
 
 untar:
 	tar -zxvf *.tar.gz
