@@ -1,0 +1,160 @@
+# DESCRIPTION
+- The task is to simulate printing in a bus network using concurrent programming.
+- A bus network is a local area network (LAN) topology in which each node, a workstation or other device, is connected to a main cable or link called a bus.
+- All connected stations on the bus can communicate with all others on the singular network segment.
+- This bus network follows a specific procedure to ensure the integrity of the communication between nodes.
+
+# MCS Queue Lock
+- In order to mitigate the issue of mixed print-work by the printer in the network, only one other node on the network is allowed to broadcast a print request to the printer at any given time. The process of printing is as follow:
+    - All nodes have to stand in a queue to print. There are 5 different nodes in the network excluding the printer. Each node must send at least 5 print request to the printer.
+    - Each node can only send a single print request at a time.
+    - When a node attempts to print some material it stands in a queue if there is one,otherwise it can just submit the request.
+- Note:
+    - A thread will simulate a node and the printer will be the critical section.
+    - Once a nodes' print request is first in the queue, the thread will sleep for a randomly selected amount of time between 200 and 1000 milliseconds before exiting.
+- Output
+    - The following output is expected:
+        - When a node ATTEMPTS to print some material, the following will need to be
+            output:[Thread-Name][Request-Number] printing request.
+        - When a nodes' request has been RECEIVED by the printer, the following will need to be
+            output:[Thread-Name][Request-Number] printing [random-message].
+        - When a nodes' printing is DONE, the following will need to be output:
+            QUEUE:{[Thread-Name]:[Request-Number]}->....
+            Example:QUEUE:{Thread-1:Request 1}->{Thread-2:Request 1}
+            Note:This is the print request queue
+    - Note that you will have to be creative in printing the queue. Hint: consider using the qnode to store the information.
+    - Start-up code.
+        class Qnode {
+            boolean locked = false;
+            qnode next = null;
+        }
+        class MCSLock implements Lock {
+            AtomicReference tail;
+            public void lock() {
+                // Make a QNode
+                Qnode qnode = new Qnode();
+                // add my Node to the tail of queue
+                Qnode pred = tail.getAndSet(qnode);
+                // Fix if queue was non-empty
+                if (pred != null) {
+                    qnode.locked = true;
+                    pred.next = qnode;
+                    // Wait until unlocked
+                    while (qnode.locked) {}
+                }
+            }
+            public void unlock() {
+                // Missing successor?
+                if (qnode.next == null) {
+                    // If really no successor, return
+                    if (tail.CAS(qnode, null)) {
+                        return;
+                    }
+                    // Otherwise wait for successor to catch up
+                    while (qnode.next == null) {}
+                }
+                // Pass lock to successor
+                qnode.next.locked = false;
+            }
+        }
+
+# Time-out Lock
+    - The following needs to be completed:
+        - The MCS Queue Lock from the previous task needs to be replaced by a Time-outLock
+        - Implement your Time-out Lock inside aTimeout class.
+        - Change the simulation you have created to make use of the Time-out instead of the MCS Queue.
+        - The output remains the same as Task 1.
+    - Note: Select a timeout based on the acceptable time a node should wait/spend in printing request.
+    - Start-up code.
+        public class TOLock implements Lock {
+            // Distinguished node to signify free lock
+            static Qnode AVAILABLE = new Qnode();
+            // Tail of the queue
+            AtomicReference<Qnode> tail;
+            // Remember my node ...
+            ThreadLocal<Qnode> myNode;
+
+            public boolean lock(long timeout) {
+                // Create & initialize node
+                Qnode qnode = new Qnode();
+                myNode.set(qnode);
+                qnode.prev = null;
+                // Swap with tail
+                Qnode myPred = tail.getAndSet(qnode);
+                // If predecessor absent or released, we are done
+                if (myPred== null || myPred.prev == AVAILABLE) {
+                    return true;
+                }
+                long start = now();
+                // Keep trying for a while ...
+                while (now()- start < timeout) {
+                    // Spin on predecessor's prev field
+                    Qnode predPred = myPred.prev;
+                    // Predecessor released lock
+                    if (predPred == AVAILABLE) {
+                        return true;
+                    } else if (predPred != null) { // Predecessor aborted, advance one
+                        myPred = predPred;
+                    }
+                }
+                // Do I have a successor? If CAS fails: I do have a successor, tell it about myPred
+                if (!tail.compareAndSet(qnode, myPred)) {
+                    qnode.prev = myPred;
+                }
+                // If CAS succeeds: no successor, simply return false
+                return false;
+            }
+            public void unlock() {
+                Qnode qnode = myNode.get();
+                // If CAS failed: exists successor, notify successor it can enter
+                // CAS successful: set tail to null, no clean up since no successor waiting
+                if (!tail.compareAndSet(qnode, null)) {
+                    qnode.prev = AVAILABLE;
+                }
+            }
+        }
+# Classes and Skeleton Codes
+public class Main {
+    public static void main(String args[]){
+        // TODO: Code Here ..
+    }
+}
+---
+public class Node extends Thread {
+
+    private Printer p;
+
+	Node(Printer _p)
+	{
+		this.p = _p ;
+	}
+
+	@Override
+	public void run()
+	{
+        // TODO: Code Here ..
+	}
+}
+---
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.Lock;
+public class MCSQueue implements Lock{
+    // TODO: Code Here ..
+}
+---
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.Lock;
+public class Timeout implements Lock {
+    // TODO: Code Here ..
+}
+---
+import java.util.concurrent.locks.Lock;
+public class Printer {
+    Lock l;
+
+	public void Print(){
+        // TODO: Code Here ..
+	}
+}
