@@ -1,69 +1,66 @@
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
-public class Bakery implements Lock
-{
-	private volatile boolean []  flag;
-	private volatile int [] label;
-	private int n;
-	public Bakery(int n)
-	{
-		this.n=n;
-		flag= new boolean[n];
-		label=new int[n];
-		for(int i = 0;i < n; ++i)
-		{
-			flag[i] = false;
-			label[i] = 0;
+
+public class Bakery implements Lock {
+	private volatile boolean[]  flag;
+	private volatile int[] label;
+	private int numThreads;
+
+	public Bakery (int num) {
+		this.numThreads = num;
+		this.flag = new boolean[this.numThreads];
+		this.label = new int[this.numThreads];
+		for (int i = 0; i < this.numThreads; i++) {
+			this.flag[i] = false;
+			this.label[i] = 0;
 		}
 	}
+
 	@Override
-	public void lock()
-	{
-		int i = filterThread(Thread.currentThread().getName());
-		flag[i] = true;
-		label[i] = max(label);
-		for(int k = 0;k < n; k++)
-		{
-			while((k!=i) && (flag[k] && label[k]<label[i]))
-			{
-				//spin
+	public void lock() {
+		int index = this.filterThread(String.valueOf(Thread.currentThread().getId()));
+		this.flag[index] = true;
+		this.label[index] = max_label(label);
+		for (int k = 0; k < this.numThreads; k++) {
+			while (((this.flag[k] == true) && (this.label[k] < this.label[index])) || ((this.label[k] == this.label[index]) && (k < index))) {
+				// spin wait
 			}
 		}
 	}
-	public void lockInterruptibly() throws InterruptedException
-	{
+
+	public void lockInterruptibly() throws InterruptedException {
 		throw new UnsupportedOperationException();
 	}
-	public boolean tryLock()
-	{
+
+	public boolean tryLock() {
 		throw new UnsupportedOperationException();
 	}
-	public boolean tryLock(long time, TimeUnit unit) throws InterruptedException
-	{
+
+	public boolean tryLock(long time, TimeUnit unit) throws InterruptedException {
 		throw new UnsupportedOperationException();
 	}
+
 	@Override
-	public void unlock()
-	{
-		flag[filterThread(Thread.currentThread().getName())]=false;
+	public void unlock() {
+		this.flag[this.filterThread(String.valueOf(Thread.currentThread().getId()))] = false;
 	}
-	public Condition newCondition()
-	{
+
+	public Condition newCondition() {
 		throw new UnsupportedOperationException();
 	}
-	public int filterThread(String thread)
-	{
-		return Character.getNumericValue(thread.charAt(7));
+
+	public int filterThread(String thread) {
+		return Integer.parseInt(thread.substring(thread.length() - 1));
 	}
-	public int max(int [] arr)
-	{
-		int maxValue=Integer.MIN_VALUE;
-		for(int i = 0;i < arr.length;++i)
-		{
-			if(arr[i] > maxValue)
-				maxValue = arr[i];
+
+	public int max_label(int[] labels_arr) {
+		int maxValue = labels_arr[0];
+		for (int i = 1; i < labels_arr.length; i++) {
+			if (labels_arr[i] > maxValue) {
+				maxValue = labels_arr[i];
+			}
 		}
-		return maxValue+1;
+		return maxValue + 1;
 	}
 }
