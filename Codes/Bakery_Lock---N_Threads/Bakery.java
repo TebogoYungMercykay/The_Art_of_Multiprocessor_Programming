@@ -2,21 +2,16 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 
-// Name: Selepe Sello
-// Student Number: u20748052
-
-public class Bakery implements Lock
-{
-	private volatile boolean[] flag;
+public class Bakery implements Lock {
+	private volatile boolean[]  flag;
 	private volatile int[] label;
 	private int numThreads;
 
-	public Bakery(int numThreads) {
-		this.numThreads = numThreads;
+	public Bakery (int num) {
+		this.numThreads = num;
 		this.flag = new boolean[this.numThreads];
 		this.label = new int[this.numThreads];
-
-		for(int i = 0; i < this.numThreads; i++) {
+		for (int i = 0; i < this.numThreads; i++) {
 			this.flag[i] = false;
 			this.label[i] = 0;
 		}
@@ -24,45 +19,14 @@ public class Bakery implements Lock
 
 	@Override
 	public void lock() {
-		// Get the Current thread's ID
-		int index = (filterThread(Thread.currentThread().getName())) % 4;
-
+		int index = this.filterThread(String.valueOf(Thread.currentThread().getId()));
 		this.flag[index] = true;
-		this.label[index] = getMaximumLabel(label);
-
-		for(int j = 0; j < this.numThreads; j++) {
-			while((j != index) && this.flag[j] && (this.label[j] < this.label[index]) || (this.label[j] == this.label[index]) && (j < index)) {
-				// Waiting
+		this.label[index] = max_label(label);
+		for (int k = 0; k < this.numThreads; k++) {
+			while (((this.flag[k] == true) && (this.label[k] < this.label[index])) || ((this.label[k] == this.label[index]) && (k < index))) {
+				// spin wait
 			}
 		}
-	}
-
-	boolean[] getflag() {
-		return this.flag;
-	}
-
-	int[] getlabel() {
-		return this.label;
-	}
-
-	@Override
-	public void unlock() {
-		int index = filterThread(Thread.currentThread().getName());
-		this.flag[index] = false;
-	}
-
-	public int getMaximumLabel(int[] labels_array) {
-		int maximum_value = Integer.MIN_VALUE;
-		for(int i = 0; i < labels_array.length; i++) {
-			if(labels_array[i] > maximum_value) {
-				maximum_value = labels_array[i];
-			}
-		}
-		return maximum_value + 1;
-	}
-
-	public int filterThread(String thread) {
-		return Character.getNumericValue(thread.charAt(7));
 	}
 
 	public void lockInterruptibly() throws InterruptedException {
@@ -77,7 +41,26 @@ public class Bakery implements Lock
 		throw new UnsupportedOperationException();
 	}
 
+	@Override
+	public void unlock() {
+		this.flag[this.filterThread(String.valueOf(Thread.currentThread().getId()))] = false;
+	}
+
 	public Condition newCondition() {
 		throw new UnsupportedOperationException();
+	}
+
+	public int filterThread(String thread) {
+		return Integer.parseInt(thread.substring(thread.length() - 1));
+	}
+
+	public int max_label(int[] labels_arr) {
+		int maxValue = labels_arr[0];
+		for (int i = 1; i < labels_arr.length; i++) {
+			if (labels_arr[i] > maxValue) {
+				maxValue = labels_arr[i];
+			}
+		}
+		return maxValue + 1;
 	}
 }
