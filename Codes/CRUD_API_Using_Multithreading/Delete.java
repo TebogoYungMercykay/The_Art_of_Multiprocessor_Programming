@@ -8,7 +8,7 @@ public class Delete extends Thread {
     @Override
     public void run() {
         while(!api_request.getDeleteQueue().isEmpty()) {
-            api_request.DeleteQueue();
+            api_request.DeleteOperation();
         }
     }
 }

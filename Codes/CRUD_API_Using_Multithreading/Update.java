@@ -8,7 +8,7 @@ public class Update extends Thread {
     @Override
     public void run() {
         while(!api_request.getUpdateQueue().isEmpty()) {
-            api_request.UpdateQueue();
+            api_request.UpdateOperation();
         }
     }
 }
