@@ -1,3 +1,6 @@
+// Names: Selepe Sello
+// Student Number: uXXXXXXXX
+
 public class Info {
 
     public String id;
