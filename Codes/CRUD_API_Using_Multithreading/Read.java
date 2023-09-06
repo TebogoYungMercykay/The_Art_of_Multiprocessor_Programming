@@ -8,7 +8,7 @@ public class Read extends Thread {
     @Override
     public void run() {
         while(!api_request.getReadQueue().isEmpty()) {
-            api_request.ReadQueue();
+            api_request.ReadOperation();
         }
     }
 }

@@ -14,11 +14,10 @@ public class Info {
         this.attempt = 0;
 
         switch (operation) {
-            case 'c': practicals=0 ; assignments=0 ; 
+            case 'c': practicals = 0; assignments = 0;
                 break;
-            case 'u': practicals=10 ; assignments=10 ;
+            case 'u': practicals = 10; assignments = 10;
                 break;
         }
     }
-    
 }

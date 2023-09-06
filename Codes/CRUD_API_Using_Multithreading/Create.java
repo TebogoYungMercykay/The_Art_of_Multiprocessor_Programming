@@ -8,7 +8,7 @@ public class Create extends Thread {
     @Override
     public void run() {
         while(!api_request.getCreateQueue().isEmpty()) {
-            api_request.CreateQueue();
+            api_request.CreateOperation();
         }
     }
 }

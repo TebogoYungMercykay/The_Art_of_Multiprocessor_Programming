@@ -23,6 +23,7 @@ public class Bakery implements Lock {
 		this.flag[index] = true;
 		this.label[index] = max_label(label);
 		for (int k = 0; k < this.numThreads; k++) {
+			// while((k!=i) && (flag[k] && label[k]<label[i]))
 			while (((this.flag[k] == true) && (this.label[k] < this.label[index])) || ((this.label[k] == this.label[index]) && (k < index))) {
 				// spin wait
 			}
