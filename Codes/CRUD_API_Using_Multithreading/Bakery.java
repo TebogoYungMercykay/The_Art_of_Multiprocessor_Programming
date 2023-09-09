@@ -1,6 +1,8 @@
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
+// Names: Selepe Sello
+// Student Number: uXXXXXXXX
 
 public class Bakery implements Lock {
 	private volatile boolean[]  flag;
@@ -19,7 +21,7 @@ public class Bakery implements Lock {
 
 	@Override
 	public void lock() {
-		int index = this.filterThread(String.valueOf(Thread.currentThread().getId()));
+		int index = this.filterThread(String.valueOf(Thread.currentThread().getName()));
 		this.flag[index] = true;
 		this.label[index] = max_label(label);
 		for (int k = 0; k < this.numThreads; k++) {
@@ -44,7 +46,7 @@ public class Bakery implements Lock {
 
 	@Override
 	public void unlock() {
-		this.flag[this.filterThread(String.valueOf(Thread.currentThread().getId()))] = false;
+		this.flag[this.filterThread(String.valueOf(Thread.currentThread().getName()))] = false;
 	}
 
 	public Condition newCondition() {

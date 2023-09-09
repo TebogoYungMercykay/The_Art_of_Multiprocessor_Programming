@@ -1,3 +1,6 @@
+// Names: Selepe Sello
+// Student Number: uXXXXXXXX
+
 public class Update extends Thread {
     public Crud api_request;
 
