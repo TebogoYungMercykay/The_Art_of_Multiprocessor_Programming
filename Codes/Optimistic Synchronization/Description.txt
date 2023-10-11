@@ -1,0 +1,21 @@
+# DESCRIPTION:
+The Task is to simulate a security protocol for access control.
+The protocol is for access to an art gallery.The access protocol works as follow:
+    - The gallery has 5 entrances/access points each controlled by a security personnel.
+    - When a person enters the gallery they are given a random time between 100 and 1000 ms which they can be in the gallery.  When the time lapse they will be escorted by security out of the gallery.
+    - People (art lovers) will have to form a queue at each access point and the security personnel will only allow one person into the gallery after every 200 ms, it can be later but not earlier
+    - Each person will have to leave the gallery using the access point/door they used when they came in.
+    - Since there is only one security guard at each access point, the guards will be excused if times lapse while they are busy with other duties
+
+# Note:
+- A thread will simulate a security personnel responsible for a specific access point/entrance and the gallery will be the critical section.
+- At each access point/entrance there are 10 people
+
+# OUTPUT
+The following output is expected:
+- Every-time a person enters the gallery, print out the person-name and the time they are allocated
+    – [Thread-name]: ADD ([Person-number],[time-left])
+    – Example: Thread-1: ADD (P-1, 120ms)
+- Everytime a person leaves the gallery, print out the linked list
+    – [Thread-name]:([Person-number],[time-left]),([Person-number],[time-left]), ....
+    – Example: Thread-1: (P-1, 400ms), (P-4, 375ms)
