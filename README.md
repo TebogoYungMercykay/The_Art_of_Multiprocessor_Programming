@@ -8,7 +8,7 @@
 - Instead of executing tasks sequentially, concurrent systems allow for overlapping or simultaneous execution of tasks, which can lead to improved performance, responsiveness, and resource utilization.
 - These systems are especially important in modern computing, where multi-core processors and distributed computing environments are common.
 
-	<img src="./Images/Assembly_Random.png" alt="Assembly language" width="100%" height="500">
+	<img src="./Images/Random.jpg" alt="Concurrency & Multithreading" width="100%" height="500">
 
 - #### `Key Concepts and Considerations:`
 
