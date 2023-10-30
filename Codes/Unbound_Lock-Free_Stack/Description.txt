@@ -1,0 +1,17 @@
+I am tasked with simulating a security protocol that uses an unbounded lock-free stack as the central database to schedule jobs on the system. There are two roles I can take on in this system, each with different authorization levels:
+
+- As a Developer:
+    - I am responsible for scheduling jobs that need to be done.
+    - I insert the job requests into the central database.
+    - Each job I schedule has a number of hours required to perform the job, which is generated randomly between 1-24.
+
+- As a System Administrator:
+    - I inspect the job schedule created by developers and approve or disapprove them.
+    - I remove the job requests from the central database.
+    - I accept a job if its hours are less than a randomly generated number between 1-24.
+
+In my code, I must demonstrate concurrency using a variable number of threads, at a ratio of 1:2 System Admin to Developer, ideally 2:4. As a developer, I must schedule at least 3 jobs.
+
+The following output is expected from my actions:
+1. Demonstrate insertion: (IN) [my thread-name] [job-number] [hours]
+2. Demonstrate removal: (OUT) [my thread-name] [job-number] [hours] [my approval-status]
